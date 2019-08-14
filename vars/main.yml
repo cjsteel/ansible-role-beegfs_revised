@@ -1,0 +1,190 @@
+---
+# vars file for beegfs
+
+beegfs_state: present
+
+_beegfs_repo_vars:
+
+  default:
+    beegfs_repo_url: "https://www.beegfs.io/release/latest-stable/dists/beegfs-deb9.list"
+    beegfs_repo_key: "https://www.beegfs.io/release/latest-stable/gpg/DEB-GPG-KEY-beegfs"
+    beegfs_repo_file: "/etc/apt/sources.list.d/beegfs_deb9.list"
+
+  Debian:
+    beegfs_repo_url: "https://www.beegfs.io/release/latest-stable/dists/beegfs-deb9.list"
+    beegfs_repo_key: "https://www.beegfs.io/release/latest-stable/gpg/DEB-GPG-KEY-beegfs"
+    beegfs_repo_file: "/etc/apt/sources.list.d/beegfs_deb9.list"
+
+  # CentOS-6:
+  #  beegfs_repo_url: "https://www.beegfs.io/release/latest-stable/dists/beegfs-rhel6.repo"
+  #  beegfs_repo_key: "https://www.beegfs.io/release/beegfs_7_1/gpg/RPM-GPG-KEY-beegfs"
+  #  beegfs_repo_file: "/etc/yum.repos.d/beegfs-rhel7.repo"
+
+  CentOS-7:
+    beegfs_repo_url: "https://www.beegfs.io/release/latest-stable/dists/beegfs-rhel7.repo"
+    beegfs_repo_key: "https://www.beegfs.io/release/latest-stable/gpg/RPM-GPG-KEY-beegfs"
+    beegfs_repo_file: "/etc/yum.repos.d/beegfs-rhel7.repo"
+
+  #Fedora:
+  #  beegfs_repo_url: "https://www.beegfs.io/release/latest-stable/dists/beegfs-rhel7.repo"
+  #  beegfs_repo_key: "https://www.beegfs.io/release/latest-stable/gpg/RPM-GPG-KEY-beegfs"
+  #  beegfs_repo_file: "/etc/yum.repos.d/beegfs-rhel7.repo"
+
+  openSUSE Leap:
+   beegfs_repo_url: "https://www.beegfs.io/release/latest-stable/dists/beegfs-sles12.repo"
+   beegfs_repo_key: "https://www.beegfs.io/release/beegfs_7_1/gpg/RPM-GPG-KEY-beegfs"
+   beegfs_repo_file: "beegfs-sles12.repo"
+
+  #Ubuntu:
+  #  beegfs_repo_url: "https://www.beegfs.io/release/latest-stable/dists/beegfs-deb9.list"
+  #  beegfs_repo_key: "https://www.beegfs.io/release/latest-stable/gpg/DEB-GPG-KEY-beegfs"
+  #  beegfs_repo_file: "/etc/apt/sources.list.d/beegfs_deb9.list"
+
+beegfs_add_repos: true
+beegfs_repo_url: "{{ _beegfs_repo_vars[ansible_os_family]['beegfs_repo_url'] }}"
+beegfs_repo_key: "{{ _beegfs_repo_vars[ansible_os_family]['beegfs_repo_key'] }}"
+beegfs_repo_file: "{{ _beegfs_repo_vars[ansible_os_family]['beegfs_repo_file'] }}"
+
+_beegfs_requirements:
+  default:
+    - base-files
+    - apt-transport-https
+
+beegfs_requirements: "{{ _beegfs_requirements[ansible_distribution ~ '-' ~ ansible_distribution_major_version] | default(_beegfs_requirements[ansible_distribution] | default(_beegfs_requirements['default'])) }}"
+
+## storage
+
+_beegfs_storage_requirements:
+  default:
+    - beegfs-storage
+  Alpine:
+    - beegfs-storage
+  Archlinux:
+    - beegfs-storage
+  Debian:
+    - beegfs-storage
+  CentOS:
+    - beegfs-storage
+  CentOS-7:
+    - beegfs-storage
+  Fedora:
+    - beegfs-storage
+  openSUSE Leap:
+    - beegfs-storage
+  Ubuntu:
+    - beegfs-storage
+
+beegfs_storage_requirements: "{{ _beegfs_storage_requirements[ansible_distribution ~ '-' ~ ansible_distribution_major_version] | default(_beegfs_storage_requirements[ansible_distribution] | default(_beegfs_storage_requirements['default'])) }}"
+
+## metadata
+
+_beegfs_metadata_requirements:
+  default:
+    - beegfs-meta
+  Alpine:
+    - beegfs-meta
+  Archlinux:
+    - beegfs-meta
+  Debian:
+    - beegfs-meta
+  CentOS:
+    - beegfs-meta
+  CentOS-7:
+    - beegfs-meta
+  Fedora:
+    - beegfs-meta
+  openSUSE Leap:
+    - beegfs-meta
+  Ubuntu:
+    - beegfs-meta
+
+beegfs_metadata_requirements: "{{ _beegfs_metadata_requirements[ansible_distribution ~ '-' ~ ansible_distribution_major_version] | default(_beegfs_metadata_requirements[ansible_distribution] | default(_beegfs_metadata_requirements['default'])) }}"
+
+## management
+
+_beegfs_management_requirements:
+  default:
+    - beegfs-mgmtd
+    - beegfs-utils
+  Alpine:
+    - beegfs-mgmtd
+    - beegfs-utils
+  Archlinux:
+    - beegfs-mgmtd
+    - beegfs-utils
+  Debian:
+    - beegfs-mgmtd
+    - beegfs-utils
+  CentOS:
+    - beegfs-mgmtd
+    - beegfs-utils
+  CentOS-7:
+    - beegfs-mgmtd
+    - beegfs-utils
+  Fedora:
+    - beegfs-mgmtd
+    - beegfs-utils
+  openSUSE Leap:
+    - beegfs-mgmtd
+    - beegfs-utils
+  Ubuntu:
+    - beegfs-mgmtd
+    - beegfs-utils
+
+beegfs_management_requirements: "{{ _beegfs_management_requirements[ansible_distribution ~ '-' ~ ansible_distribution_major_version] | default(_beegfs_management_requirements[ansible_distribution] | default(_beegfs_management_requirements['default'])) }}"
+
+## client
+
+_beegfs_client_requirements:
+  default:
+    - beegfs-client
+    - beegfs-helperd
+    - beegfs-utils
+  Alpine:
+    - beegfs-client
+    - beegfs-helperd
+    - beegfs-utils
+  Archlinux:
+    - beegfs-client
+    - beegfs-helperd
+    - beegfs-utils
+  Debian:
+    - beegfs-client
+    - beegfs-helperd
+    - beegfs-utils
+  CentOS:
+    - beegfs-client
+    - beegfs-helperd
+    - beegfs-utils
+  CentOS-7:
+    - beegfs-client
+    - beegfs-helperd
+    - beegfs-utils
+  Fedora:
+    - beegfs-client
+    - beegfs-helperd
+    - beegfs-utils
+  openSUSE Leap:
+    - beegfs-client
+    - beegfs-helperd
+    - beegfs-utils
+  Ubuntu:
+    - beegfs-client
+    - beegfs-helperd
+    - beegfs-utils
+
+beegfs_client_requirements: "{{ _beegfs_client_requirements[ansible_distribution ~ '-' ~ ansible_distribution_major_version] | default(_beegfs_client_requirements[ansible_distribution] | default(_beegfs_client_requirements['default'])) }}"
+
+####### Below not reviewed yet
+
+_beegfs_config_directory:
+  default: /etc
+
+beegfs_config_directory: "{{ _beegfs_config_directory[ansible_distribution] | default(_beegfs_config_directory['default']) }}"
+
+beegfs_config_file: beegfs.conf
+
+_beegfs_service:
+  default: beegfs
+
+beegfs_service: "{{ _beegfs_service[ansible_distribution] | default(_beegfs_service['default']) }}"

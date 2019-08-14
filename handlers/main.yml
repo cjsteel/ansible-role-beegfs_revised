@@ -1,0 +1,8 @@
+---
+# handlers file for beegfs
+- name: restart beegfs
+  service:
+    name: "{{ beegfs_service }}"
+    state: restarted
+  when:
+    - ansible_virtualization_type != "docker"

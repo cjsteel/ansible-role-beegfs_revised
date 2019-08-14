@@ -1,0 +1,128 @@
+---
+
+- name: Ensure the BeeGFS package repo is defined
+  get_url:
+    url: "{{ beegfs_repo_url }}"
+    dest: "{{ beegfs_repo_file }}"
+  register: beegfs_repo_defined
+  until: beegfs_repo_defined is succeeded
+  retries: 3
+  when: beegfs_state == 'present'
+
+- name: add apt key for debian family machines
+  apt_key:
+    state: '{{ beegfs_state }}'
+    url: "{{ beegfs_repo_key }}"
+  register: beegfs_apt_key_added
+  until: beegfs_apt_key_added is succeeded
+  retries: 3
+
+- name: add rpm key for redhat family machines
+  rpm_key:
+    state: '{{ beegfs_state }}'
+    key: "{{ beegfs_repo_key }}"
+    validate_certs: no
+  ignore_errors: yes
+  register: beegfs_rpm_key_added
+  until: beegfs_rpm_key_added is succeeded
+  retries: 3
+ 
+- name: add zypper repository
+  zypper_repository:
+    state: '{{ beegfs_state }}'
+    name: jenkins
+    repo: "{{ jenkins_zypper_repository_repo }}"
+  when:
+    - ansible_pkg_mgr == "zypper"
+
+- name: install beegfs requirements
+  package:
+    name: "{{ beegfs_requirements }}"
+    state: '{{ beegfs_state }}'
+  register: beegfs_install_requirements
+  until: beegfs_install_requirements is succeeded
+  retries: 3
+
+# tasks file for beegfs
+## RDMA
+#- include: rdma.yml
+#  when: beegfs_rdma | bool
+
+
+## Managment
+- name: install beegfs Management service packages
+  package:
+    name: "{{ beegfs_management_requirements }}"
+    state: '{{ beegfs_state }}'
+  register: beegfs_install_management_requirements
+  until: beegfs_install_management_requirements is succeeded
+  retries: 3
+  when: beegfs_enable.management | default(false) | bool
+
+## ADMON
+
+#- include: admon.yml
+#  when: beegfs_enable.admon | default(false) | bool
+
+# Install required packages
+
+## Install Metadata Server packages
+
+- name: install beegfs Metadata service packages
+  package:
+    name: "{{ beegfs_metadata_requirements }}"
+    state: '{{ beegfs_state }}'
+  register: beegfs_install_metadata_requirements
+  until: beegfs_install_metadata_requirements is succeeded
+  retries: 3
+  when: beegfs_enable.metadata | default(false) | bool
+
+## Install Storage Service(s)
+
+- name: install beegfs Storage service packages
+  package:
+    name: "{{ beegfs_storage_requirements }}"
+    state: '{{ beegfs_state }}'
+  register: beegfs_install_storage_requirements
+  until: beegfs_install_storage_requirements is succeeded
+  retries: 3
+  when: beegfs_enable.storage | default(false) | bool
+
+## Install Tuning stuff
+
+# - include: tuning.yml
+#  when: beegfs_enable.tuning | default(false) | bool
+
+## Install Client Serivce(s)
+
+- name: install beegfs client packages
+  package:
+    name: "{{ beegfs_client_requirements }}"
+    state: '{{ beegfs_state }}'
+  register: beegfs_install_client_requirements
+  until: beegfs_install_client_requirements is succeeded
+  retries: 3
+  when: beegfs_enable.client | default(false) | bool
+
+#- name: install beegfs
+#  package:
+#    name: "{{ beegfs_packages }}"
+#    state: '{{ beegfs_state }}'
+#  register: beegfs_install_beegfs
+#  until: beegfs_install_beegfs is succeeded
+#  retries: 3
+
+#- name: configure beegfs
+#  template:
+#    src: "{{ beegfs_config_file }}.j2"
+#    dest: "{{ beegfs_config_directory }}/{{ beegfs_config_file }}"
+#  notify:
+#    - restart beegfs
+
+#- name: start and enable beegfs
+#  service:
+#    name: "{{ beegfs_service }}"
+#    state: started
+#    enabled: yes
+#  when:
+#    - ansible_virtualization_type != "docker"

@@ -1,0 +1,31 @@
+---
+dependency:
+  name: galaxy
+  options:
+    role-file: requirements.yml
+lint:
+  name: yamllint
+driver:
+  name: vagrant
+  provider:
+    name: virtualbox
+platforms:
+  - name: beegfs-bionic
+    box: ubuntu/bionic64
+  #- name: beegfs-debian
+  #  box: debian/stretch64
+  #- name: beegfs-fedora
+  #  box: fedora/30-cloud-base
+provisioner:
+  name: ansible
+  playbooks:
+    prepare: ../resources/prepare.yml
+    converge: ../resources/playbook.yml
+  lint:
+    name: ansible-lint
+  inventory:
+    host_vars:
+      beegfs-fedora:
+        ansible_python_interpreter: /usr/bin/python3
+scenario:
+  name: vagrant
