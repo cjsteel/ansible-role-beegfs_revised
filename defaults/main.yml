@@ -1,2 +1,41 @@
 ---
 # defaults file for beegfs
+
+# Kernel modules to ensure are loaded prior to BeeGFS deploy/startup
+beegfs_kmod_preload: []
+
+# Network interfaces in order of preference
+# (leaving empty means InfiniBand & RDMA enabled devices are preferred)
+beegfs_interfaces:  #[]
+  - eth0
+# Distribution-specific parameters
+beegfs_distro_vars:
+  RedHat:
+    beegfs_repo_url: "https://www.beegfs.io/release/latest-stable/dists/beegfs-rhel7.repo"
+    beegfs_repo_key: "https://www.beegfs.io/release/latest-stable/gpg/RPM-GPG-KEY-beegfs"
+    beegfs_repo_file: "/etc/yum.repos.d/beegfs-rhel7.repo"
+    kernel_dev_pkg: "kernel-devel"
+    rdma_dev_pkgs:
+      - "librdmacm"
+      - "libibmad"
+      - "libibumad"
+      - "rdma-core"
+      - "libibverbs"
+      - "libibverbs-utils"
+      - "libbeegfs-ib"
+
+  Debian:
+    beegfs_repo_url: "https://www.beegfs.io/release/latest-stable/dists/beegfs-deb9.list"
+    beegfs_repo_key: "https://www.beegfs.io/release/latest-stable/gpg/DEB-GPG-KEY-beegfs"
+    beegfs_repo_file: "/etc/apt/sources.list.d/beegfs_deb9.list"
+    kernel_dev_pkg: "linux-headers"
+    rdma_dev_pkgs:
+      - "librdmacm-dev"
+      - "libibmad-dev"
+      - "libibumad-dev"
+      - "libibverbs-dev"
+      - "libbeegfs-ib"
+
+
+# Path to the kernel module
+beegfs_kernel_module: "/lib/modules/{{ ansible_kernel }}/updates/fs/beegfs_autobuild/beegfs.ko"
